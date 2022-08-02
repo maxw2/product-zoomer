@@ -104,9 +104,9 @@ class ProductZoomer {
 
         this.$dom.maskTop.el.addEventListener('mouseenter', this.onmouseenter.bind(this))
         this.$dom.maskTop.el.addEventListener('mousemove', mouseFn.bind(this))
-        // this.$dom.maskTop.el.addEventListener('mousemove', this.onmousemove.bind(this))
         this.$dom.maskTop.el.addEventListener('mouseleave', this.onmouseleave.bind(this))
 
+        this.$dom.image.el.addEventListener('load', this.onimgLoad.bind(this))
     }
 
     onmouseenter(ev: MouseEvent) {
@@ -139,6 +139,15 @@ class ProductZoomer {
         this.$dom.maskBox.el.style.visibility = 'hidden'
         this.$dom.zoomerBox.el.style.visibility = 'hidden'
     }
+
+    onimgLoad(ev: Event) {
+        const currentEle = ev.currentTarget as HTMLImageElement
+        // console.log(currentEle, currentEle.clientWidth,111)
+        this.$dom.image.width = currentEle.clientWidth
+        this.$dom.image.height = currentEle.clientHeight
+        this.$dom.zoomerBox.el.style.backgroundSize = `${this.$dom.image.width / this.$dom.maskBox.width * 100}% ${this.$dom.image.height / this.$dom.maskBox.height * 100}%`
+    }
+
 
     // 更换图片
     repeact(imgUrl: string) {

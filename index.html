@@ -5,14 +5,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="./dist/ProductZoomer.js"></script>
+    <script src="./dist/bundle.js"></script>
     <title>Product-zoomer</title>
 </head>
 
 <body>
     <div class="product-box"></div>
+    <!-- <video controls src="https://res.zgkj.work/sv/5ed03fea-17edc6d1606/5ed03fea-17edc6d1606.mp4"></video> -->
 </body>
+<script>
+// console.log(axios.get())
+const pic = new ProductZoomer('.product-box',)
+pic.repeact('https://gd-hbimg.huaban.com/72c96a5f19908bec1e71cae49ca0cc2a7c1e0e9858a99-24nwAk_fw1200')
+
+console.log(pic)
+</script>
 <style>
+    body {
+        display: flex;
+    }
     .product-box {
         margin-left: 120px;
     }

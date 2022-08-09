@@ -1,17 +1,19 @@
 interface DOM {
-    imageBox: DOMELE // 商品图盒子
-    image: DOMELE // 商品图片
-    maskBox: DOMELE // 小蒙版 放大镜
-    maskTop: DOMELE // 顶层蒙版
-    zoomerBox: DOMELE // 放大图片
+    'zoomer-box'?: DOMELE // 发
+    imageBox?: DOMELE // 商品图盒子
+    image?: DOMELE // 商品图片
+    maskBox?: DOMELE // 小蒙版 放大镜
+    maskTop?: DOMELE // 顶层蒙版
+    zoomerBox?: DOMELE // 放大图片
 }
 
 interface DOMELE {
     el: HTMLElement,
     width: number,
-    height: number
+    height: number,
+    child?: DOMELE[]
 }
-
+import { createElement } from "./util"
 class ProductZoomer {
     $el: Element
     $dom: DOM
@@ -26,75 +28,35 @@ class ProductZoomer {
     // 
     initDom() {
         const className = this.$el.classList[0]
-
-        const imageBox = document.createElement('div')
-        const image = document.createElement('img')
-        const maskBox = document.createElement('div')
-        const maskTop = document.createElement('div')
-        const zoomerBox = document.createElement('div')
-        const zoomerImg = document.createElement('img')
-
-        imageBox.className = `${className}-imageBox`
-        image.className = `${className}-imageBox-image`
-        maskBox.className = `${className}-imageBox-maskBox`
-        maskTop.className = `${className}-maskTop`
-        zoomerBox.className = `${className}-zoomerBox`
-        zoomerImg.className = `${className}-zoomerBox-image`
-
-
-        setTimeout(() => {
-            this.$dom.imageBox.width = imageBox.clientWidth
-            this.$dom.imageBox.height = imageBox.clientHeight
-            this.$dom.image.width = image.clientWidth
-            this.$dom.image.height = image.clientHeight
-            this.$dom.maskBox.width = maskBox.clientWidth
-            this.$dom.maskBox.height = maskBox.clientHeight
-            this.$dom.maskTop.width = maskTop.clientWidth
-            this.$dom.maskTop.height = maskTop.clientHeight
-            this.$dom.zoomerBox.width = zoomerBox.clientWidth
-            this.$dom.zoomerBox.height = zoomerBox.clientHeight
-            
-            this.$dom.zoomerBox.el.style.backgroundSize = `${this.$dom.image.width / this.$dom.maskBox.width * 100}% ${this.$dom.image.height / this.$dom.maskBox.height * 100}%`
+        this.$dom = createElement({
+            tag: 'div',
+            key: `zoomer-box`,
+            attrs: [{ 'class': `${className}-zoomer-box` }],
+            child: [{
+                tag: 'div',
+                key: 'imageBox',
+                attrs: [{ 'class': `${className}-zoomer-box-imageBox` }],
+                child: [{
+                    tag: 'img',
+                    key: 'image',
+                    attrs: [{ 'class': `${className}-zoomer-box-imageBox-image` }]
+                }, {
+                    tag: 'div',
+                    key: 'maskBox',
+                    attrs: [{ 'class': `${className}-zoomer-box-imageBox-maskBox` }]
+                }]
+            }, {
+                tag: 'div',
+                key: 'maskTop',
+                attrs: [{ 'class': `${className}-zoomer-box-maskTop` }]
+            }, {
+                tag: 'div',
+                key: 'zoomerBox',
+                attrs: [{ 'class': `${className}-zoomer-box-zoomerBox` }]
+            }]
         })
-
-
-        this.$dom = {
-            imageBox: {
-                el: imageBox,
-                width: imageBox.clientWidth,
-                height: imageBox.clientHeight
-            },
-
-            image: {
-                el: image as HTMLImageElement,
-                width: image.clientWidth,
-                height: image.clientHeight
-            },
-
-            maskBox: {
-                el: maskBox,
-                width: maskBox.clientWidth,
-                height: maskBox.clientHeight
-            },
-
-            maskTop: {
-                el: maskTop,
-                width: maskTop.clientWidth,
-                height: maskTop.clientHeight
-            },
-
-            zoomerBox: {
-                el: zoomerBox,
-                width: zoomerBox.clientWidth,
-                height: zoomerBox.clientHeight
-            }
-
-        }
-
-        this.$el.appendChild(this.$dom.imageBox.el)
-        this.$dom.imageBox.el.append(this.$dom.image.el, this.$dom.maskBox.el)
-        this.$el.appendChild(this.$dom.maskTop.el)
-        this.$el.appendChild(this.$dom.zoomerBox.el)
+        this.$el.appendChild(this.$dom['zoomer-box'].el)
+        console.log(this.$dom, 'createElement')
 
     }
 
@@ -131,7 +93,7 @@ class ProductZoomer {
         if (ev.offsetY >= this.$dom.imageBox.height - this.$dom.maskBox.height / 2) y = this.$dom.imageBox.height - this.$dom.maskBox.height
 
         maskBox.style.transform = `translate(${x}px,${y}px)`
-        
+
         this.$dom.zoomerBox.el.style.backgroundPosition = `-${x * maskRatioWidth * zoomerRatioWidth}px -${y * maskRatioHeight * zoomerRatioHeight}px`
     }
 

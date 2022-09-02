@@ -163,7 +163,7 @@ class ProductZoomer {
         const sdom = splitTemplate(template);
         const vdom = createVirtualDom_(sdom);
         this.$dom = createElement(vdom)[0];
-        console.log(this.$dom, '$dom', sdom, 'sDom', vdom, 'vDom');
+        console.log(this.$dom.box, '$dom', sdom, 'sDom', vdom, 'vDom');
         // this.$dom = createElement({
         //     tag: 'div',
         //     okey: `zoomer-box`,
@@ -192,8 +192,8 @@ class ProductZoomer {
         //         attrs: [{ 'class': `${className}-zoomer-box-zoomerBox` }]
         //     },'This is Text']
         // })[0]
-        console.log(this.$dom.box, 'createElement');
-        this.$el.appendChild(this.$dom['box'].el);
+        console.log(this.$dom, 'createElement');
+        this.$el.appendChild(this.$dom.box.el);
     }
     // 添加事件
     initEvent() {

@@ -1,5 +1,5 @@
 interface DOM {
-    'zoomer-box'?: DOMELE // 发
+    box?: DOMELE // 发
     imageBox?: DOMELE // 商品图盒子
     image?: DOMELE // 商品图片
     maskBox?: DOMELE // 小蒙版 放大镜
@@ -25,7 +25,7 @@ interface Replace {
 import { createElement, createVirtualDom_, splitTemplate } from "./util"
 class ProductZoomer {
     $el: Element
-    $dom: Edom
+    $dom: DOM
     $opt: any
     constructor(el: string | Element, options: any) {
         this.$el = typeof el === 'string' ? document.querySelector(el) : el
@@ -51,7 +51,7 @@ class ProductZoomer {
         const sdom = splitTemplate(template)
         const vdom = createVirtualDom_(sdom)
         this.$dom = createElement(vdom)[0]
-        console.log(this.$dom, '$dom', sdom, 'sDom', vdom, 'vDom')
+        console.log(this.$dom.box, '$dom', sdom, 'sDom', vdom, 'vDom')
 
         // this.$dom = createElement({
         //     tag: 'div',
@@ -81,8 +81,8 @@ class ProductZoomer {
         //         attrs: [{ 'class': `${className}-zoomer-box-zoomerBox` }]
         //     },'This is Text']
         // })[0]
-        console.log(this.$dom.box, 'createElement')
-        this.$el.appendChild(this.$dom['box'].el)
+        console.log(this.$dom, 'createElement')
+        this.$el.appendChild(this.$dom.box.el)
         
 
     }

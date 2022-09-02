@@ -13,10 +13,19 @@ interface DOMELE {
     height: number,
     child?: DOMELE[]
 }
-import { createElement } from "./util"
+
+interface Replace {
+    headImg?: string
+    videoUrl: string
+    icon?: string
+}
+
+
+
+import { createElement, createVirtualDom_, splitTemplate } from "./util"
 class ProductZoomer {
     $el: Element
-    $dom: DOM
+    $dom: Edom
     $opt: any
     constructor(el: string | Element, options: any) {
         this.$el = typeof el === 'string' ? document.querySelector(el) : el
@@ -28,35 +37,53 @@ class ProductZoomer {
     // 
     initDom() {
         const className = this.$el.classList[0]
-        this.$dom = createElement({
-            tag: 'div',
-            key: `zoomer-box`,
-            attrs: [{ 'class': `${className}-zoomer-box` }],
-            child: [{
-                tag: 'div',
-                key: 'imageBox',
-                attrs: [{ 'class': `${className}-zoomer-box-imageBox` }],
-                child: [{
-                    tag: 'img',
-                    key: 'image',
-                    attrs: [{ 'class': `${className}-zoomer-box-imageBox-image` }]
-                }, {
-                    tag: 'div',
-                    key: 'maskBox',
-                    attrs: [{ 'class': `${className}-zoomer-box-imageBox-maskBox` }]
-                }]
-            }, {
-                tag: 'div',
-                key: 'maskTop',
-                attrs: [{ 'class': `${className}-zoomer-box-maskTop` }]
-            }, {
-                tag: 'div',
-                key: 'zoomerBox',
-                attrs: [{ 'class': `${className}-zoomer-box-zoomerBox` }]
-            }]
-        })
-        this.$el.appendChild(this.$dom['zoomer-box'].el)
-        console.log(this.$dom, 'createElement')
+        const template = 
+            `<div class="${className}-box" okey="box" >
+                <div class='${className}-box-imageBox' okey="imageBox" >
+                    <img class="${className}-box-imageBox-image" okey="image" class="image-1" />
+                    <div class="${className}-box-imageBox-maskBox" okey="maskBox"></div>
+                </div>
+                <div class="${className}-box-maskTop" okey="maskTop"></div>
+                <div class="${className}-box-zoomerBox" okey="zoomerBox"></div>
+            </div>`
+
+        // const vdom = createVirtualDom(template)
+        const sdom = splitTemplate(template)
+        const vdom = createVirtualDom_(sdom)
+        this.$dom = createElement(vdom)[0]
+        console.log(this.$dom, '$dom', sdom, 'sDom', vdom, 'vDom')
+
+        // this.$dom = createElement({
+        //     tag: 'div',
+        //     okey: `zoomer-box`,
+        //     attrs: [{ 'class': `${className}-zoomer-box` }],
+        //     child: [{
+        //         tag: 'div',
+        //         okey: 'imageBox',
+        //         attrs: [{ 'class': `${className}-zoomer-box-imageBox` }],
+        //         child: [{
+        //             tag: 'img',
+        //             okey: 'image',
+        //             attrs: [{ 'class': `${className}-zoomer-box-imageBox-image` }]
+        //         }, {
+        //             tag: 'div',
+        //             okey: 'maskBox',
+        //             attrs: [{ 'class': `${className}-zoomer-box-imageBox-maskBox` }]
+        //         }]
+        //     }, {
+        //         tag: 'div',
+        //         okey: 'maskTop',
+        //         attrs: [{ 'class': `${className}-zoomer-box-maskTop` }],
+        //         child: null
+        //     }, {
+        //         tag: 'div',
+        //         okey: 'zoomerBox',
+        //         attrs: [{ 'class': `${className}-zoomer-box-zoomerBox` }]
+        //     },'This is Text']
+        // })[0]
+        console.log(this.$dom.box, 'createElement')
+        this.$el.appendChild(this.$dom['box'].el)
+        
 
     }
 
@@ -112,9 +139,12 @@ class ProductZoomer {
 
 
     // 更换图片
-    repeact(imgUrl: string) {
-        this.$dom.image.el.setAttribute('src', imgUrl)
-        this.$dom.zoomerBox.el.style.backgroundImage = `url(${imgUrl})`
+    replace(option: string | Replace) {
+        if(typeof option === 'string') {
+          this.$dom.image.el.setAttribute('src', option)
+          this.$dom.zoomerBox.el.style.backgroundImage = `url(${option})`  
+        }
+        
     }
 
     render() {

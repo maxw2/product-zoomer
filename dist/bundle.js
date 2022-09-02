@@ -27,43 +27,74 @@ function styleInject(css, ref) {
   }
 }
 
-var css_248z = ".product-box-zoomer-box {\n  position: relative;\n  width: 400px;\n  height: 400px; }\n  .product-box-zoomer-box-imageBox {\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow: hidden; }\n    .product-box-zoomer-box-imageBox-image {\n      width: 100%; }\n    .product-box-zoomer-box-imageBox-maskBox {\n      visibility: hidden;\n      position: absolute;\n      top: 0px;\n      left: 0px;\n      width: 100px;\n      height: 100px;\n      background: rgba(0, 0, 0, 0.5); }\n  .product-box-zoomer-box-maskTop {\n    cursor: move;\n    position: absolute;\n    top: 0px;\n    left: 0px;\n    width: 100%;\n    height: 100%; }\n  .product-box-zoomer-box-zoomerBox {\n    visibility: hidden;\n    position: absolute;\n    top: 0px;\n    right: -20px;\n    width: 600px;\n    height: 600px;\n    border: 1px solid gray;\n    transform: translateX(100%);\n    background-repeat: no-repeat; }\n";
+var css_248z = ".product-box-box {\n  position: relative;\n  width: 400px;\n  height: 400px; }\n  .product-box-box-imageBox {\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow: hidden; }\n    .product-box-box-imageBox-image {\n      width: 100%; }\n    .product-box-box-imageBox-maskBox {\n      visibility: hidden;\n      position: absolute;\n      top: 0px;\n      left: 0px;\n      width: 100px;\n      height: 100px;\n      background: rgba(0, 0, 0, 0.5); }\n  .product-box-box-maskTop {\n    cursor: move;\n    position: absolute;\n    top: 0px;\n    left: 0px;\n    width: 100%;\n    height: 100%; }\n  .product-box-box-zoomerBox {\n    visibility: hidden;\n    position: absolute;\n    top: 0px;\n    right: -20px;\n    width: 600px;\n    height: 600px;\n    border: 1px solid gray;\n    transform: translateX(100%);\n    background-repeat: no-repeat; }\n";
 styleInject(css_248z);
 
-/******************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-
-var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+// 
+function splitTemplate(vTem) {
+    // 暂用警号匹配
+    const Rex = /(<[^\/].*?[^\/]>)|(<.*? \/>)|(<\/.*?>)|#(.*)#/gm;
+    // const RexString = />(.*)</gm
+    const arr = [];
+    const temArr = [];
+    let exec = null;
+    // console.log(vTem)
+    while ((exec = Rex.exec(vTem)) !== null) {
+        // console.log(exec, 'exec')
+        if (exec[1]) {
+            temArr.push(exec[1]);
+            arr.push(1);
         }
-        return t;
+        else if (exec[2]) {
+            temArr.push(exec[2]);
+            arr.push(3);
+        }
+        else if (exec[3]) {
+            temArr.push(exec[3]);
+            arr.push(2);
+        }
+        else if (exec[4]) ;
+    }
+    console.log(arr, temArr);
+    const t = long(arr, temArr)[0];
+    const vdom = createVirtualDom_(t);
+    console.log(vdom, 'vdom');
+    // console.log(t)
+    return t;
+}
+// 
+function createVirtualDom_(Sdom) {
+    // console.log(Sdom, 'Sdom')
+    let vdom = {
+        tag: null
     };
-    return __assign.apply(this, arguments);
-};
-
+    const head = Sdom.head;
+    const Rex = /(\w+)\s|(\w+)=[',"](.+?)[',"]/g;
+    let execCache;
+    while ((execCache = Rex.exec(head)) !== null) {
+        if (execCache[1])
+            vdom.tag = execCache[1];
+        else if (execCache[2] && execCache[2] === 'okey')
+            vdom.okey = execCache[3];
+        else if (execCache[2] && execCache[3]) {
+            // console.log(typeof execCache[2], 'ex', execCache[3])
+            const key = execCache[2];
+            if (!vdom.attrs)
+                vdom.attrs = [];
+            vdom.attrs.push({ [key]: execCache[3] });
+        }
+    }
+    vdom.child = Sdom.child && Sdom.child.map(item => createVirtualDom_(item));
+    return vdom;
+}
+// 
 function createElement(vdom) {
-    var _a, _b;
-    var edata = { el: null, width: null, height: null };
-    var dData = {};
-    var ele = document.createElement(vdom.tag);
-    (_a = vdom === null || vdom === void 0 ? void 0 : vdom.attrs) === null || _a === void 0 ? void 0 : _a.forEach(function (item) {
-        Object.keys(item).forEach(function (key) {
-            var d = ele.getAttribute(key);
+    let edata = { el: null, width: null, height: null };
+    let edom = {};
+    const ele = document.createElement(vdom.tag);
+    vdom?.attrs?.forEach(item => {
+        Object.keys(item).forEach(key => {
+            const d = ele.getAttribute(key);
             if (d)
                 ele.setAttribute(key, d + ' ' + item[key]);
             else
@@ -71,93 +102,121 @@ function createElement(vdom) {
         });
     });
     edata.el = ele;
-    setTimeout(function () {
+    setTimeout(() => {
         edata.width = ele.clientWidth;
         edata.height = ele.clientHeight;
     });
-    // if (vdom.child) {
-    (_b = vdom === null || vdom === void 0 ? void 0 : vdom.child) === null || _b === void 0 ? void 0 : _b.forEach(function (item) {
-        if (item.key) {
-            var data = createElement(item);
-            dData = __assign(__assign({}, dData), data);
-            edata.el.append(data[item.key].el);
+    vdom?.child?.forEach(item => {
+        if (typeof item === 'string') {
+            ele.append(item);
         }
         else {
-            var data = createElement(item);
-            edata.el.append(data.el);
+            const [_edom, _edata] = createElement(item);
+            ele.append(_edata.el);
+            edom = { ...edom, ..._edom };
         }
     });
-    // }
-    if (vdom.key) {
-        dData[vdom.key] = edata;
-        return dData;
-    }
+    if (vdom.okey)
+        return [{ [vdom.okey]: edata, ...edom }, edata];
     else
-        return edata;
-    // return vdom.key ? dData || edata
-    // return dData
+        return [edom, edata];
+}
+function long(arr, sArr) {
+    let hk = 0;
+    let h = 0;
+    let _arr = [];
+    arr.forEach((v, i) => {
+        if (v === 1)
+            hk++;
+        else if (v === 2)
+            hk--;
+        if (hk === 0) {
+            // const rex = /[^<>]*/g
+            // console.log(sArr[h],' 1', rex.exec(sArr[h])[0])
+            _arr.push({
+                head: sArr[h],
+                child: long(arr.slice(h + 1, i), sArr.slice(h + 1, i))
+            });
+            h = i + 1;
+        }
+    });
+    return _arr.length ? _arr : null;
 }
 
-var ProductZoomer = /** @class */ (function () {
-    function ProductZoomer(el, options) {
+class ProductZoomer {
+    constructor(el, options) {
         this.$el = typeof el === 'string' ? document.querySelector(el) : el;
         console.log(this.$el);
         this.initDom();
         this.initEvent();
     }
     // 
-    ProductZoomer.prototype.initDom = function () {
-        var className = this.$el.classList[0];
-        this.$dom = createElement({
-            tag: 'div',
-            key: "zoomer-box",
-            attrs: [{ 'class': "".concat(className, "-zoomer-box") }],
-            child: [{
-                    tag: 'div',
-                    key: 'imageBox',
-                    attrs: [{ 'class': "".concat(className, "-zoomer-box-imageBox") }],
-                    child: [{
-                            tag: 'img',
-                            key: 'image',
-                            attrs: [{ 'class': "".concat(className, "-zoomer-box-imageBox-image") }]
-                        }, {
-                            tag: 'div',
-                            key: 'maskBox',
-                            attrs: [{ 'class': "".concat(className, "-zoomer-box-imageBox-maskBox") }]
-                        }]
-                }, {
-                    tag: 'div',
-                    key: 'maskTop',
-                    attrs: [{ 'class': "".concat(className, "-zoomer-box-maskTop") }]
-                }, {
-                    tag: 'div',
-                    key: 'zoomerBox',
-                    attrs: [{ 'class': "".concat(className, "-zoomer-box-zoomerBox") }]
-                }]
-        });
-        this.$el.appendChild(this.$dom['zoomer-box'].el);
-        console.log(this.$dom, 'createElement');
-    };
+    initDom() {
+        const className = this.$el.classList[0];
+        const template = `<div class="${className}-box" okey="box" >
+                <div class='${className}-box-imageBox' okey="imageBox" >
+                    <img class="${className}-box-imageBox-image" okey="image" class="image-1" />
+                    <div class="${className}-box-imageBox-maskBox" okey="maskBox"></div>
+                </div>
+                <div class="${className}-box-maskTop" okey="maskTop"></div>
+                <div class="${className}-box-zoomerBox" okey="zoomerBox"></div>
+            </div>`;
+        // const vdom = createVirtualDom(template)
+        const sdom = splitTemplate(template);
+        const vdom = createVirtualDom_(sdom);
+        this.$dom = createElement(vdom)[0];
+        console.log(this.$dom, '$dom', sdom, 'sDom', vdom, 'vDom');
+        // this.$dom = createElement({
+        //     tag: 'div',
+        //     okey: `zoomer-box`,
+        //     attrs: [{ 'class': `${className}-zoomer-box` }],
+        //     child: [{
+        //         tag: 'div',
+        //         okey: 'imageBox',
+        //         attrs: [{ 'class': `${className}-zoomer-box-imageBox` }],
+        //         child: [{
+        //             tag: 'img',
+        //             okey: 'image',
+        //             attrs: [{ 'class': `${className}-zoomer-box-imageBox-image` }]
+        //         }, {
+        //             tag: 'div',
+        //             okey: 'maskBox',
+        //             attrs: [{ 'class': `${className}-zoomer-box-imageBox-maskBox` }]
+        //         }]
+        //     }, {
+        //         tag: 'div',
+        //         okey: 'maskTop',
+        //         attrs: [{ 'class': `${className}-zoomer-box-maskTop` }],
+        //         child: null
+        //     }, {
+        //         tag: 'div',
+        //         okey: 'zoomerBox',
+        //         attrs: [{ 'class': `${className}-zoomer-box-zoomerBox` }]
+        //     },'This is Text']
+        // })[0]
+        console.log(this.$dom.box, 'createElement');
+        this.$el.appendChild(this.$dom['box'].el);
+    }
     // 添加事件
-    ProductZoomer.prototype.initEvent = function () {
-        var mouseFn = throttle(this.onmousemove.bind(this), 10);
+    initEvent() {
+        const mouseFn = throttle(this.onmousemove.bind(this), 10);
         this.$dom.maskTop.el.addEventListener('mouseenter', this.onmouseenter.bind(this));
         this.$dom.maskTop.el.addEventListener('mousemove', mouseFn.bind(this));
         this.$dom.maskTop.el.addEventListener('mouseleave', this.onmouseleave.bind(this));
         this.$dom.image.el.addEventListener('load', this.onimgLoad.bind(this));
-    };
-    ProductZoomer.prototype.onmouseenter = function (ev) {
+    }
+    onmouseenter(ev) {
         this.$dom.maskBox.el.style.visibility = 'visible';
         this.$dom.zoomerBox.el.style.visibility = 'visible';
-    };
-    ProductZoomer.prototype.onmousemove = function (ev) {
-        var maskBox = this.$dom.maskBox.el;
-        var maskRatioWidth = this.$dom.imageBox.width / this.$dom.maskBox.width;
-        var maskRatioHeight = this.$dom.imageBox.height / this.$dom.maskBox.height;
-        var zoomerRatioWidth = this.$dom.zoomerBox.width / this.$dom.imageBox.width;
-        var zoomerRatioHeight = this.$dom.zoomerBox.height / this.$dom.imageBox.height;
-        var x = ev.offsetX - (this.$dom.maskBox.width / 2);
-        var y = ev.offsetY - (this.$dom.maskBox.height / 2);
+    }
+    onmousemove(ev) {
+        const maskBox = this.$dom.maskBox.el;
+        const maskRatioWidth = this.$dom.imageBox.width / this.$dom.maskBox.width;
+        const maskRatioHeight = this.$dom.imageBox.height / this.$dom.maskBox.height;
+        const zoomerRatioWidth = this.$dom.zoomerBox.width / this.$dom.imageBox.width;
+        const zoomerRatioHeight = this.$dom.zoomerBox.height / this.$dom.imageBox.height;
+        let x = ev.offsetX - (this.$dom.maskBox.width / 2);
+        let y = ev.offsetY - (this.$dom.maskBox.height / 2);
         // 
         if (ev.offsetX <= this.$dom.maskBox.width / 2)
             x = 0;
@@ -167,36 +226,37 @@ var ProductZoomer = /** @class */ (function () {
             y = 0;
         if (ev.offsetY >= this.$dom.imageBox.height - this.$dom.maskBox.height / 2)
             y = this.$dom.imageBox.height - this.$dom.maskBox.height;
-        maskBox.style.transform = "translate(".concat(x, "px,").concat(y, "px)");
-        this.$dom.zoomerBox.el.style.backgroundPosition = "-".concat(x * maskRatioWidth * zoomerRatioWidth, "px -").concat(y * maskRatioHeight * zoomerRatioHeight, "px");
-    };
-    ProductZoomer.prototype.onmouseleave = function (ev) {
+        maskBox.style.transform = `translate(${x}px,${y}px)`;
+        this.$dom.zoomerBox.el.style.backgroundPosition = `-${x * maskRatioWidth * zoomerRatioWidth}px -${y * maskRatioHeight * zoomerRatioHeight}px`;
+    }
+    onmouseleave(ev) {
         this.$dom.maskBox.el.style.visibility = 'hidden';
         this.$dom.zoomerBox.el.style.visibility = 'hidden';
-    };
-    ProductZoomer.prototype.onimgLoad = function (ev) {
-        var currentEle = ev.currentTarget;
+    }
+    onimgLoad(ev) {
+        const currentEle = ev.currentTarget;
         // console.log(currentEle, currentEle.clientWidth,111)
         this.$dom.image.width = currentEle.clientWidth;
         this.$dom.image.height = currentEle.clientHeight;
-        this.$dom.zoomerBox.el.style.backgroundSize = "".concat(this.$dom.image.width / this.$dom.maskBox.width * 100, "% ").concat(this.$dom.image.height / this.$dom.maskBox.height * 100, "%");
-    };
+        this.$dom.zoomerBox.el.style.backgroundSize = `${this.$dom.image.width / this.$dom.maskBox.width * 100}% ${this.$dom.image.height / this.$dom.maskBox.height * 100}%`;
+    }
     // 更换图片
-    ProductZoomer.prototype.repeact = function (imgUrl) {
-        this.$dom.image.el.setAttribute('src', imgUrl);
-        this.$dom.zoomerBox.el.style.backgroundImage = "url(".concat(imgUrl, ")");
-    };
-    ProductZoomer.prototype.render = function () {
-    };
-    return ProductZoomer;
-}());
+    replace(option) {
+        if (typeof option === 'string') {
+            this.$dom.image.el.setAttribute('src', option);
+            this.$dom.zoomerBox.el.style.backgroundImage = `url(${option})`;
+        }
+    }
+    render() {
+    }
+}
 function throttle(fn, delay) {
-    var time;
+    let time;
     return function (arg) {
         // console.log(arg,'=>')
         if (time)
             return;
-        time = setTimeout(function () {
+        time = setTimeout(() => {
             fn(arg);
             time = null;
         }, delay);

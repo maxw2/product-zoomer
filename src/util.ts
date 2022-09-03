@@ -74,7 +74,7 @@ export function createVirtualDom_(Sdom: Sdom):Vdom {
             vdom.attrs.push({ [key]: execCache[3] })
         }
     }
-    vdom.child = Sdom.child && Sdom.child.map(item => createVirtualDom_(item))
+    vdom.child = Sdom.child && Sdom.child.map(item => createVirtualDom_(item as any))
 
     return vdom
 }

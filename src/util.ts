@@ -46,10 +46,10 @@ export function splitTemplate(vTem: string):Sdom {
             // console.log(exec[4], 'execDying')
         }
     }
-    console.log(arr, temArr)
+    // console.log(arr, temArr)
     const t = long(arr, temArr)[0]
-    const vdom = createVirtualDom_(t)
-    console.log(vdom, 'vdom')
+    // const vdom = createVirtualDom_(t)
+    // console.log(vdom, 'vdom')
     // console.log(t)
     return t
 }
@@ -138,59 +138,9 @@ function long(arr:number[], sArr:string[]):Sdom[] {
 
 }
 
-
-export function createVirtualDom(vTem: string): Vdom {
-
-    const _vTem = vTem
-    const headTagReg = /<(.*?)>/gm
-    let vdom: Vdom
-    const headArr = []
-    const botArr = []
-    let execCache
-    while ((execCache = headTagReg.exec(_vTem)) !== null) {
-        if (/<\//.test(execCache[0])) botArr.push(execCache)
-        else headArr.push(execCache)
-    }
-    // 数组的位数 遇到自闭合标签需要减一
-    let index = 0
-    headArr.forEach(item => {
-        const tagReg = /(\w*) /
-        const attrsReg = /(\w*)=[',"](.*?)[',"]/g
-        const $ = item[1]
-        // tag
-        const tag = tagReg.exec($)[1]
-        // attrs
-        let cache
-        let okey
-        const attrs = []
-        while ((cache = attrsReg.exec($)) !== null) {
-            const key = cache[1]
-            const value = cache[2]
-            if (value && key !== 'okey') attrs.push({ [key]: value })
-            else if (value && key === 'okey') okey = value
-            // console.log(cache, 'cache')
-        }
-        console.log(item, 'item')
-        // child 
-        const singleRex = /<.*? \/>/
-        if (singleRex.test(item[0])) {
-            index--
-            vdom = {
-                tag,
-                attrs,
-                okey
-            }
-        } else {
-            index++
-            vdom = {
-                tag,
-                attrs,
-                okey,
-                // child: createTemplate(vTem.)
-            }
-        }
-
-    })
-    return vdom
-
+export function render(template:string):Edom {
+    const sdom = splitTemplate(template)
+    const vdom = createVirtualDom_(sdom)
+    const edom = createElement(vdom)[0]
+    return edom
 }

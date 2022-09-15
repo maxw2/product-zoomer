@@ -2,16 +2,35 @@ interface DOM {
     box?: DOMELE // 发
     imageBox?: DOMELE // 商品图盒子
     image?: DOMELE // 商品图片
+
     maskBox?: DOMELE // 小蒙版 放大镜
     maskTop?: DOMELE // 顶层蒙版
+
+    fatVideoBox?: DOMELE // 带封面商品
+    fatImageBox?: DOMELE // 
+    VideoBox?: DOMELE // 
+    iconPlay?: DOMELE // 播放键
+    iconClose?: DOMELE // 关闭键
+
+    videoBox?: DOMELE // 商品视频盒子
+    video?: VIDEOELE // 商品视频
+
+
+
     zoomerBox?: DOMELE // 放大图片
 }
 
 interface DOMELE {
-    el: HTMLElement,
-    width: number,
-    height: number,
-    child?: DOMELE[]
+    el: HTMLElement
+    width: number
+    height: number
+    // child?: DOMELE[]
+}
+
+interface VIDEOELE {
+    el: HTMLMediaElement
+    width: number
+    height: number
 }
 
 interface Replace {
@@ -22,69 +41,120 @@ interface Replace {
 
 
 
-import { createElement, createVirtualDom_, splitTemplate } from "./util"
+import { render } from "./util"
+
+import grid from './assest/grid.png'
+import sprite from './assest/sprite.png'
+
 class ProductZoomer {
     $el: Element
     $dom: DOM
     $opt: any
-    constructor(el: string | Element, options: any) {
+    constructor(el: string | Element, options?: Replace) {
         this.$el = typeof el === 'string' ? document.querySelector(el) : el
-        console.log(this.$el)
-        this.initDom()
-        this.initEvent()
+        this.$el.classList.add('product-zoomer')
+        if (options) this.$opt = options
+
     }
 
-    // 
-    initDom() {
-        const className = this.$el.classList[0]
-        const template = 
-            `<div class="${className}-box" okey="box" >
-                <div class='${className}-box-imageBox' okey="imageBox" >
-                    <img class="${className}-box-imageBox-image" okey="image" class="image-1" />
-                    <div class="${className}-box-imageBox-maskBox" okey="maskBox"></div>
-                </div>
-                <div class="${className}-box-maskTop" okey="maskTop"></div>
-                <div class="${className}-box-zoomerBox" okey="zoomerBox"></div>
-            </div>`
+    // createImageBox() {
+    //     const template = `
+    //         <div class='image-box' okey='imageBox' >
+    //             <img class='image' okey='image' />
+    //             <div class='mask-box' okey='maskBox'></div>
+    //             <div class='mask-top' okey='maskTop'></div>
+    //         </div>
+    //     `
 
-        // const vdom = createVirtualDom(template)
-        const sdom = splitTemplate(template)
-        const vdom = createVirtualDom_(sdom)
-        this.$dom = createElement(vdom)[0]
-        console.log(this.$dom.box, '$dom', sdom, 'sDom', vdom, 'vDom')
+    //     return data
+    // }
 
-        // this.$dom = createElement({
-        //     tag: 'div',
-        //     okey: `zoomer-box`,
-        //     attrs: [{ 'class': `${className}-zoomer-box` }],
-        //     child: [{
-        //         tag: 'div',
-        //         okey: 'imageBox',
-        //         attrs: [{ 'class': `${className}-zoomer-box-imageBox` }],
-        //         child: [{
-        //             tag: 'img',
-        //             okey: 'image',
-        //             attrs: [{ 'class': `${className}-zoomer-box-imageBox-image` }]
-        //         }, {
-        //             tag: 'div',
-        //             okey: 'maskBox',
-        //             attrs: [{ 'class': `${className}-zoomer-box-imageBox-maskBox` }]
-        //         }]
-        //     }, {
-        //         tag: 'div',
-        //         okey: 'maskTop',
-        //         attrs: [{ 'class': `${className}-zoomer-box-maskTop` }],
-        //         child: null
-        //     }, {
-        //         tag: 'div',
-        //         okey: 'zoomerBox',
-        //         attrs: [{ 'class': `${className}-zoomer-box-zoomerBox` }]
-        //     },'This is Text']
-        // })[0]
-        console.log(this.$dom, 'createElement')
-        this.$el.appendChild(this.$dom.box.el)
+    initImageBox() {
+        const topEle = this.$dom?.imageBox?.el
+        const template = `
+            <div class='image-box' okey='imageBox' >
+                <img class='image' okey='image' />
+                <div class='mask-box' okey='maskBox'></div>
+                <div class='mask-top' okey='maskTop'></div>
+            </div>
+        `
+
+
+        if (this.$dom?.videoBox?.el) this.$dom.videoBox.el.remove()
+        if (this.$dom?.fatVideoBox?.el) this.$dom.fatVideoBox.el.remove()
+        if (topEle && topEle.parentElement) this.$el.append(this.$dom.imageBox.el)
+        else {
+            this.$dom = { ...this.$dom, ...render(template) }
+            this.$el.append(this.$dom.imageBox.el)
+            this.initZoomerBox()
+            this.initEvent()
+            this.$dom.maskBox.el.style.backgroundImage = `url(${grid})`
+        }
         
+    }
+    // 
+    initVideoBox() {
+        const topEle = this.$dom?.videoBox?.el
+        const template = `
+            <div class='video-box' okey='videoBox'>
+                <video controls='true' okey='video' />
+            </div>
+        `
+        if (this.$dom?.imageBox?.el) this.$dom.imageBox.el.remove()
+        if (this.$dom?.fatVideoBox?.el) this.$dom.fatVideoBox.el.remove()
+        if (topEle && topEle.parentElement) this.$el.append(this.$dom.videoBox.el)
+        else {
+            console.log('video append')
+            this.$dom = { ...this.$dom, ...render(template) }
+            this.$el.append(this.$dom.videoBox.el)
+        }
 
+
+    }
+
+    initFatVideoBox() {
+        const topEle = this.$dom?.fatVideoBox?.el
+        const template = `
+            <div class='fat-video-box' okey='fatVideoBox'>
+                <div class='image-box' okey='fatImageBox' >
+                    <img class='image' okey='image' />
+                    <div class='mask-box' okey='maskBox'></div>
+                    <div class='mask-top' okey='maskTop'></div>
+                    <div class='icon-play' okey='iconPlay'></div>
+                </div>
+                <div class='video-box' okey='VideoBox'>
+                  <div class='icon-close' okey='iconClose'></div>
+                  <video controls='true' okey='video' />
+                </div>
+            </div>
+        `
+
+        if (this.$dom?.imageBox?.el) this.$dom.imageBox.el.remove()
+        if (this.$dom?.videoBox?.el) this.$dom.videoBox.el.remove()
+
+        if (topEle && topEle.parentElement) this.$el.append(this.$dom.fatVideoBox.el)
+        else {
+            this.$dom = { ...this.$dom, ...render(template) }
+            this.$el.append(this.$dom.fatVideoBox.el)
+            this.initFatEvent()
+            this.$dom.maskBox.el.style.backgroundImage = `url(${grid})`
+            this.$dom.iconPlay.el.style.backgroundImage = `url(${sprite})`
+            this.$dom.iconClose.el.style.backgroundImage = `url(${sprite})`
+        }
+
+    }
+    // 
+    initZoomerBox() {
+        const topEle = this.$dom?.fatVideoBox?.el
+        const template = `
+            <div class='zoomer-box' okey='zoomerBox'></div>
+        `
+        if (topEle && topEle.parentElement) return 
+        else {
+            this.$dom = { ...this.$dom, ...render(template) }
+            this.$el.append(this.$dom.zoomerBox.el)
+        }
+        
     }
 
     // 添加事件
@@ -95,7 +165,37 @@ class ProductZoomer {
         this.$dom.maskTop.el.addEventListener('mousemove', mouseFn.bind(this))
         this.$dom.maskTop.el.addEventListener('mouseleave', this.onmouseleave.bind(this))
 
-        this.$dom.image.el.addEventListener('load', this.onimgLoad.bind(this))
+        // this.$dom.image.el.addEventListener('load', this.onimgLoad.bind(this))
+    }
+
+    // fat添加事件
+    initFatEvent() {
+        const mouseFn = throttle(this.onmousemove.bind(this), 10)
+
+        this.$dom.maskTop.el.addEventListener('mouseenter', this.onmouseenter.bind(this))
+        this.$dom.maskTop.el.addEventListener('mousemove', mouseFn.bind(this))
+        this.$dom.maskTop.el.addEventListener('mouseleave', this.onmouseleave.bind(this))
+        
+        this.$dom.iconPlay.el.addEventListener('click', this.onclick.bind(this))
+        this.$dom.iconPlay.el.addEventListener('mouseenter', ()=>{
+            this.$dom.iconPlay.el.style.backgroundPosition = `-51px 0px`
+        })
+        this.$dom.iconPlay.el.addEventListener('mouseleave', ()=>{
+            this.$dom.iconPlay.el.style.backgroundPosition = `0px 0px`
+        })
+        this.$dom.iconClose.el.addEventListener('click',()=>{
+            this.$dom.fatImageBox.el.style.visibility = 'visible'
+            console.log(this.$dom.fatImageBox, 'fatImageBox')
+            const video = this.$dom.video.el 
+            video.pause()
+        })
+    }
+
+    onclick(ev:Event) {
+        this.$dom.fatImageBox.el.style.visibility = 'hidden'
+        const video = this.$dom.video.el 
+        video.play()
+        
     }
 
     onmouseenter(ev: MouseEvent) {
@@ -121,6 +221,7 @@ class ProductZoomer {
 
         maskBox.style.transform = `translate(${x}px,${y}px)`
 
+        this.$dom.zoomerBox.el.style.backgroundSize = `${maskRatioWidth * zoomerRatioWidth * 100}%`
         this.$dom.zoomerBox.el.style.backgroundPosition = `-${x * maskRatioWidth * zoomerRatioWidth}px -${y * maskRatioHeight * zoomerRatioHeight}px`
     }
 
@@ -137,18 +238,23 @@ class ProductZoomer {
         this.$dom.zoomerBox.el.style.backgroundSize = `${this.$dom.image.width / this.$dom.maskBox.width * 100}% ${this.$dom.image.height / this.$dom.maskBox.height * 100}%`
     }
 
-
     // 更换图片
     replace(option: string | Replace) {
-        if(typeof option === 'string') {
-          this.$dom.image.el.setAttribute('src', option)
-          this.$dom.zoomerBox.el.style.backgroundImage = `url(${option})`  
+        this.$opt = option
+        if (typeof option === 'string') {
+            this.initImageBox()
+            this.$dom.image.el.setAttribute('src', option)
+            this.$dom.zoomerBox.el.style.backgroundImage = `url(${option})`
         }
-        
-    }
-
-    render() {
-
+        else {
+            if (option.headImg) {
+                this.initFatVideoBox()
+                this.$dom.image.el.setAttribute('src', option.headImg)
+                this.$dom.zoomerBox.el.style.backgroundImage = `url(${option.headImg})`
+            }
+            else this.initVideoBox()
+            this.$dom.video.el.setAttribute('src', option.videoUrl)
+        }
     }
 
 }

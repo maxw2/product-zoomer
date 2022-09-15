@@ -1,5 +1,8 @@
 import typescript from 'rollup-plugin-typescript'
 import postcss from 'rollup-plugin-postcss'
+import image from '@rollup/plugin-image';
+// import nodeResolve from 'rollup-plugin-node-resolve'
+
 export default {
     input: 'index.js',
     output: [{
@@ -17,6 +20,13 @@ export default {
         exclude: "node_modules/**",
         typescript: require("typescript"),
       }),
-      postcss()
+      postcss(),
+      image()
+      // nodeResolve(
+      //   {
+      //     jsnext: true,
+      //     main: true
+      //   }
+      // ),
     ], 
   };

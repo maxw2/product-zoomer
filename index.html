@@ -11,27 +11,58 @@
 
 <body>
     <div class="product-box"></div>
-    <!-- <video controls src="https://res.zgkj.work/sv/5ed03fea-17edc6d1606/5ed03fea-17edc6d1606.mp4"></video> -->
+    <button onclick="clickImage()">image</button>
+    <button onclick="clickVideo()">video</button>
+    <button onclick="clickFatVideo()">fatVideo</button>
 </body>
 <script>
-// console.log(axios.get())
 const pic = new ProductZoomer('.product-box',)
 pic.replace('https://gd-hbimg.huaban.com/72c96a5f19908bec1e71cae49ca0cc2a7c1e0e9858a99-24nwAk_fw1200')
-pic.replace({
-    headImg: '',
-    videoUrl: '',
-    icon: ''
-})
+
+// 'https://res.zgkj.work/sv/5ed03fea-17edc6d1606/5ed03fea-17edc6d1606.mp4'
+
+function clickImage() {
+    console.log('image')
+    pic.replace('https://gd-hbimg.huaban.com/72c96a5f19908bec1e71cae49ca0cc2a7c1e0e9858a99-24nwAk_fw1200')
+}
+
+function clickVideo() {
+    console.log('video')
+    pic.replace({
+        videoUrl: 'https://res.shuiapp.com.cn/sv/4610a745-182f29737d6/4610a745-182f29737d6.mp4',
+        icon: ''
+    })
+}
+
+function clickFatVideo() {
+    console.log('video')
+    pic.replace({
+        headImg: 'https://gd-hbimg.huaban.com/50e5719cbc8de5b124d04505fb9055fe2b737d4a4dc7a-6cFWLj',
+        videoUrl: 'https://res.shuiapp.com.cn/sv/4610a745-182f29737d6/4610a745-182f29737d6.mp4',
+        icon: ''
+    })
+}
 
 
 console.log(pic)
 </script>
 <style>
     body {
-        display: flex;
+        margin-left: 120px;
     }
     .product-box {
-        margin-left: 120px;
+        width: 400px;
+        height: 400px;
+    }
+    .mask-box {
+        width: 200px !important;
+        height: 200px !important;
+    }
+    .zoomer-box {
+        right: -410px !important;
+    }
+    button {
+        margin-top: 40px;
     }
 </style>
 
